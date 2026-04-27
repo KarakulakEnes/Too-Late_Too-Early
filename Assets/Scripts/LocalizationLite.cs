@@ -72,6 +72,7 @@ public class LocalizationLite : MonoBehaviour
                     "En İyi Skor: {0}",
                     "Son Skor: {0}",
                     "Skor: {0}",
+                    "Can: {0}",
                     "Final Skor: {0}",
                     "En İyi Skor: {0}");
             }
@@ -113,6 +114,7 @@ public class LocalizationLite : MonoBehaviour
                 "Best Score: {0}",
                 "Last Score: {0}",
                 "Score: {0}",
+                "Lives: {0}",
                 "Final Score: {0}",
                 "Best Score: {0}");
         }

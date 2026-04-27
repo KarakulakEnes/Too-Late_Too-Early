@@ -17,6 +17,12 @@ public class UIManager : MonoBehaviour
 
     [Header("Game UI")]
     [SerializeField] private TMP_Text scoreText;
+    [SerializeField] private Image[] lifeHeartImages;
+    [SerializeField] private Sprite heartFullSprite;
+    [SerializeField] private Sprite heartEmptySprite;
+    [SerializeField] private float heartLoseAnimDuration = 0.16f;
+    [SerializeField] private float heartLoseShakeStrength = 7f;
+    [SerializeField] private float heartLoseFadeMinAlpha = 0.35f;
     [SerializeField] private TMP_Text feedbackText;
     [SerializeField] private RectTransform progressCircleRoot;
 
@@ -44,6 +50,7 @@ public class UIManager : MonoBehaviour
 
     private Coroutine flashRoutine;
     private Coroutine pulseRoutine;
+    private Coroutine heartLoseRoutine;
 
     public void ShowMainMenu(int bestScore, int lastScore)
     {
@@ -54,11 +61,12 @@ public class UIManager : MonoBehaviour
         SetText(feedbackText, string.Empty);
     }
 
-    public void ShowGame(int score)
+    public void ShowGame(int score, int lives)
     {
         SetPanelState(false, true, false);
         SetSettingsPanelVisible(false);
         UpdateScore(score);
+        UpdateLives(lives);
         ShowFeedback(string.Empty, accentColor, false);
     }
 
@@ -80,10 +88,28 @@ public class UIManager : MonoBehaviour
         SetText(scoreText, string.Format(scoreFormat, score));
     }
 
+    public void UpdateLives(int lives)
+    {
+        ApplyLivesVisuals(lives);
+    }
+
+    public void AnimateLifeLoss(int livesRemaining)
+    {
+        if (heartLoseRoutine != null)
+        {
+            StopCoroutine(heartLoseRoutine);
+            heartLoseRoutine = null;
+        }
+
+        int lostHeartIndex = Mathf.Clamp(livesRemaining, 0, lifeHeartImages.Length - 1);
+        heartLoseRoutine = StartCoroutine(AnimateLifeLossRoutine(livesRemaining, lostHeartIndex));
+    }
+
     public void ConfigureLocalizedFormats(
         string nextBestScoreFormat,
         string nextLastScoreFormat,
         string nextScoreFormat,
+        string nextLivesFormat,
         string nextFinalScoreFormat,
         string nextGameOverBestScoreFormat)
     {
@@ -102,9 +128,10 @@ public class UIManager : MonoBehaviour
         SetText(menuLastScoreText, string.Format(lastScoreFormat, lastScore));
     }
 
-    public void RefreshGameScore(int currentScore)
+    public void RefreshGameHud(int currentScore, int currentLives)
     {
         SetText(scoreText, string.Format(scoreFormat, currentScore));
+        ApplyLivesVisuals(currentLives);
     }
 
     public void RefreshGameOverScores(int finalScore, int bestScore)
@@ -251,5 +278,98 @@ public class UIManager : MonoBehaviour
 
         progressCircleRoot.localScale = Vector3.one;
         pulseRoutine = null;
+    }
+
+    private void ApplyLivesVisuals(int lives)
+    {
+        if (lifeHeartImages == null || lifeHeartImages.Length == 0)
+        {
+            return;
+        }
+
+        int clampedLives = Mathf.Clamp(lives, 0, lifeHeartImages.Length);
+        for (int i = 0; i < lifeHeartImages.Length; i++)
+        {
+            Image heartImage = lifeHeartImages[i];
+            if (heartImage == null)
+            {
+                continue;
+            }
+
+            bool isFull = i < clampedLives;
+            if (heartFullSprite != null && heartEmptySprite != null)
+            {
+                heartImage.sprite = isFull ? heartFullSprite : heartEmptySprite;
+            }
+
+            heartImage.color = Color.white;
+            heartImage.transform.localScale = Vector3.one;
+        }
+    }
+
+    private IEnumerator AnimateLifeLossRoutine(int livesRemaining, int lostHeartIndex)
+    {
+        if (lifeHeartImages == null || lifeHeartImages.Length == 0 || lostHeartIndex < 0 || lostHeartIndex >= lifeHeartImages.Length)
+        {
+            ApplyLivesVisuals(livesRemaining);
+            yield break;
+        }
+
+        Image lostHeartImage = lifeHeartImages[lostHeartIndex];
+        if (lostHeartImage == null)
+        {
+            ApplyLivesVisuals(livesRemaining);
+            yield break;
+        }
+
+        float duration = Mathf.Max(0.05f, heartLoseAnimDuration);
+        float halfDuration = duration * 0.5f;
+        float elapsed = 0f;
+        RectTransform lostHeartRect = lostHeartImage.rectTransform;
+        Vector2 originalAnchoredPos = lostHeartRect.anchoredPosition;
+
+        while (elapsed < halfDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / halfDuration);
+            float scale = Mathf.Lerp(1f, 1.22f, t);
+            lostHeartImage.transform.localScale = new Vector3(scale, scale, scale);
+            lostHeartRect.anchoredPosition = originalAnchoredPos + Random.insideUnitCircle * heartLoseShakeStrength * (1f - t * 0.4f);
+            SetImageAlpha(lostHeartImage, Mathf.Lerp(1f, heartLoseFadeMinAlpha, t));
+            yield return null;
+        }
+
+        if (heartEmptySprite != null)
+        {
+            lostHeartImage.sprite = heartEmptySprite;
+        }
+
+        elapsed = 0f;
+        while (elapsed < halfDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / halfDuration);
+            float scale = Mathf.Lerp(1.22f, 1f, t);
+            lostHeartImage.transform.localScale = new Vector3(scale, scale, scale);
+            lostHeartRect.anchoredPosition = originalAnchoredPos + Random.insideUnitCircle * heartLoseShakeStrength * 0.35f * (1f - t);
+            SetImageAlpha(lostHeartImage, Mathf.Lerp(heartLoseFadeMinAlpha, 1f, t));
+            yield return null;
+        }
+
+        lostHeartRect.anchoredPosition = originalAnchoredPos;
+        ApplyLivesVisuals(livesRemaining);
+        heartLoseRoutine = null;
+    }
+
+    private void SetImageAlpha(Image image, float alpha)
+    {
+        if (image == null)
+        {
+            return;
+        }
+
+        Color color = image.color;
+        color.a = Mathf.Clamp01(alpha);
+        image.color = color;
     }
 }

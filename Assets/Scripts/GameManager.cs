@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private AudioManager audioManager;
 
     [Header("Game Rules")]
+    [SerializeField] private int startingLives = 3;
     [SerializeField] private int continueBonusChances = 1;
     [SerializeField] private float gameOverDelaySeconds = 0.75f;
 
@@ -43,6 +44,7 @@ public class GameManager : MonoBehaviour
 
     private GameState currentState;
     private int score;
+    private int lives;
     private int lastScore;
     private int bestScore;
     private int remainingContinueChances;
@@ -83,10 +85,11 @@ public class GameManager : MonoBehaviour
         ClearResetConfirmation();
         StopPendingGameOverRoutine();
         score = 0;
+        lives = Mathf.Max(1, startingLives);
         remainingContinueChances = continueBonusChances;
         currentState = GameState.Playing;
 
-        uiManager.ShowGame(score);
+        uiManager.ShowGame(score, lives);
         timingController.Begin();
         if (audioManager != null)
         {
@@ -108,8 +111,9 @@ public class GameManager : MonoBehaviour
 
         StopPendingGameOverRoutine();
         remainingContinueChances--;
+        lives = Mathf.Clamp(lives + 1, 1, Mathf.Max(1, startingLives));
         currentState = GameState.Playing;
-        uiManager.ShowGame(score);
+        uiManager.ShowGame(score, lives);
         timingController.Begin();
         if (audioManager != null)
         {
@@ -158,6 +162,7 @@ public class GameManager : MonoBehaviour
         timingController.Stop();
 
         score = 0;
+        lives = Mathf.Max(1, startingLives);
         lastScore = 0;
         bestScore = 0;
         remainingContinueChances = continueBonusChances;
@@ -199,7 +204,7 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.Playing:
             case GameState.ResolvingFailure:
-                uiManager.RefreshGameScore(score);
+                uiManager.RefreshGameHud(score, lives);
                 break;
             case GameState.GameOver:
                 uiManager.RefreshGameOverScores(score, bestScore);
@@ -255,6 +260,21 @@ public class GameManager : MonoBehaviour
 
     private void HandleFailure(string feedback)
     {
+        lives = Mathf.Max(0, lives - 1);
+        uiManager.AnimateLifeLoss(lives);
+        uiManager.ShowFeedback(feedback, ErrorFeedbackColor, true);
+        uiManager.FlashFailure();
+        uiManager.PlayFailSfx();
+        if (audioManager != null)
+        {
+            audioManager.PlayGameOverSfx();
+        }
+        if (lives > 0)
+        {
+            timingController.ResetCycle(true);
+            return;
+        }
+
         currentState = GameState.ResolvingFailure;
         timingController.Stop();
         lastScore = score;
@@ -267,14 +287,6 @@ public class GameManager : MonoBehaviour
         }
 
         PlayerPrefs.Save();
-
-        uiManager.ShowFeedback(feedback, ErrorFeedbackColor, true);
-        uiManager.FlashFailure();
-        uiManager.PlayFailSfx();
-        if (audioManager != null)
-        {
-            audioManager.PlayGameOverSfx();
-        }
 
         StopPendingGameOverRoutine();
         gameOverRoutine = StartCoroutine(ShowGameOverWithDelay());
