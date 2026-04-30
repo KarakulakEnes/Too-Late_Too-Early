@@ -17,7 +17,6 @@ public class LocalizationLite : MonoBehaviour
     [SerializeField] private TMP_Text playButtonLabel;
     [SerializeField] private TMP_Text settingsButtonLabel;
     [SerializeField] private TMP_Text settingsTitleLabel;
-    [SerializeField] private TMP_Text closeSettingsButtonLabel;
     [SerializeField] private TMP_Text languageTitleLabel;
     [SerializeField] private TMP_Text soundTitleLabel;
     [SerializeField] private TMP_Text musicLabel;
@@ -54,7 +53,6 @@ public class LocalizationLite : MonoBehaviour
             SetLabel(playButtonLabel, "Oyna");
             SetLabel(settingsButtonLabel, "Ayarlar");
             SetLabel(settingsTitleLabel, "Ayarlar");
-            SetLabel(closeSettingsButtonLabel, "X");
             SetLabel(languageTitleLabel, "Dil");
             SetLabel(soundTitleLabel, "Ses");
             SetLabel(musicLabel, "Müzik");
@@ -75,6 +73,7 @@ public class LocalizationLite : MonoBehaviour
                     "Can: {0}",
                     "Final Skor: {0}",
                     "En İyi Skor: {0}");
+                uiManager.SetSpecialOrderCopy("Özel Sipariş", "Harika!");
             }
 
             if (gameManager != null)
@@ -96,7 +95,6 @@ public class LocalizationLite : MonoBehaviour
         SetLabel(playButtonLabel, "Play");
         SetLabel(settingsButtonLabel, "Settings");
         SetLabel(settingsTitleLabel, "Settings");
-        SetLabel(closeSettingsButtonLabel, "X");
         SetLabel(languageTitleLabel, "Language");
         SetLabel(soundTitleLabel, "Sound");
         SetLabel(musicLabel, "Music");
@@ -117,6 +115,7 @@ public class LocalizationLite : MonoBehaviour
                 "Lives: {0}",
                 "Final Score: {0}",
                 "Best Score: {0}");
+            uiManager.SetSpecialOrderCopy("Special Order", "Nice!");
         }
 
         if (gameManager != null)

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -13,6 +14,7 @@ public class GameManager : MonoBehaviour
     {
         MainMenu,
         Playing,
+        SpecialOrderPlaying,
         ResolvingFailure,
         GameOver
     }
@@ -22,11 +24,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private UIManager uiManager;
     [SerializeField] private InputHandler inputHandler;
     [SerializeField] private AudioManager audioManager;
+    [SerializeField] private SpecialOrderController specialOrderController;
 
     [Header("Game Rules")]
     [SerializeField] private int startingLives = 3;
     [SerializeField] private int continueBonusChances = 1;
     [SerializeField] private float gameOverDelaySeconds = 0.75f;
+    [SerializeField] private float specialOrderTransitionDelaySeconds = 0.35f;
 
     [Header("Reset Scores Safety")]
     [SerializeField] private TMP_Text resetScoresButtonLabel;
@@ -51,6 +55,7 @@ public class GameManager : MonoBehaviour
     private Coroutine gameOverRoutine;
     private bool resetConfirmationArmed;
     private float resetConfirmationExpiresAt;
+    private readonly HashSet<int> triggeredSpecialOrders = new HashSet<int>();
 
     private void Start()
     {
@@ -84,6 +89,7 @@ public class GameManager : MonoBehaviour
     {
         ClearResetConfirmation();
         StopPendingGameOverRoutine();
+        triggeredSpecialOrders.Clear();
         score = 0;
         lives = Mathf.Max(1, startingLives);
         remainingContinueChances = continueBonusChances;
@@ -204,6 +210,7 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.Playing:
             case GameState.ResolvingFailure:
+            case GameState.SpecialOrderPlaying:
                 uiManager.RefreshGameHud(score, lives);
                 break;
             case GameState.GameOver:
@@ -216,6 +223,8 @@ public class GameManager : MonoBehaviour
     {
         ClearResetConfirmation();
         StopPendingGameOverRoutine();
+        if (specialOrderController != null) specialOrderController.ResetToIdle();
+        uiManager.ExitSpecialOrder();
         currentState = GameState.MainMenu;
         timingController.Clear();
         uiManager.ShowMainMenu(bestScore, lastScore);
@@ -255,7 +264,116 @@ public class GameManager : MonoBehaviour
         {
             audioManager.PlayPerfectSfx();
         }
+
+        if (IsSpecialOrderTriggerScore(score) && !triggeredSpecialOrders.Contains(score))
+        {
+            triggeredSpecialOrders.Add(score);
+            timingController.Stop();
+            currentState = GameState.SpecialOrderPlaying;
+            StartCoroutine(CoStartSpecialOrder(score));
+            return;
+        }
+
         timingController.ResetCycle(true);
+    }
+
+    private static bool IsSpecialOrderTriggerScore(int s)
+    {
+        if (s == 3 || s == 30 || s == 50) return true;
+        if (s >= 100 && s % 50 == 0) return true;
+        return false;
+    }
+
+    private static float GetSpecialOrderTimeForScore(int triggerScore)
+    {
+        if (triggerScore == 3) return 20f;
+        if (triggerScore == 30) return 15f;
+        return 10f;
+    }
+
+    private IEnumerator CoStartSpecialOrder(int triggerScore)
+    {
+        float transitionDelay = Mathf.Max(0f, specialOrderTransitionDelaySeconds);
+        if (transitionDelay > 0f)
+        {
+            yield return new WaitForSeconds(transitionDelay);
+        }
+
+        if (audioManager != null)
+        {
+            audioManager.PlaySpecialOrderStart();
+        }
+
+        yield return uiManager.PlaySpecialOrderIntro();
+        if (specialOrderController == null)
+        {
+            currentState = GameState.Playing;
+            timingController.Begin();
+            yield break;
+        }
+
+        float t = GetSpecialOrderTimeForScore(triggerScore);
+        specialOrderController.BeginRound(
+            t,
+            () => { StartCoroutine(CoSpecialOrderSuccess()); },
+            () => { StartCoroutine(CoSpecialOrderFail()); },
+            (remaining) => uiManager.SetSpecialOrderTimer(remaining));
+    }
+
+    private IEnumerator CoSpecialOrderSuccess()
+    {
+        if (specialOrderController != null)
+        {
+            specialOrderController.ForceStop();
+            specialOrderController.ResetToIdle();
+        }
+
+        if (audioManager != null)
+        {
+            audioManager.PlaySpecialOrderSuccess();
+        }
+
+        score++;
+        uiManager.UpdateScore(score);
+        yield return uiManager.PlayNiceEffect();
+        currentState = GameState.Playing;
+        uiManager.ExitSpecialOrder();
+        timingController.Begin();
+        if (audioManager != null)
+        {
+            audioManager.PlayGameplayMusic();
+        }
+    }
+
+    private IEnumerator CoSpecialOrderFail()
+    {
+        if (specialOrderController != null)
+        {
+            specialOrderController.ForceStop();
+            specialOrderController.ResetToIdle();
+        }
+
+        if (audioManager != null)
+        {
+            audioManager.PlayGameOverSfx();
+        }
+
+        lives = 0;
+        uiManager.ExitSpecialOrder();
+        currentState = GameState.ResolvingFailure;
+        timingController.Stop();
+        lastScore = score;
+        PlayerPrefs.SetInt(LastScoreKey, lastScore);
+        if (score > bestScore)
+        {
+            bestScore = score;
+            PlayerPrefs.SetInt(BestScoreKey, bestScore);
+        }
+
+        PlayerPrefs.Save();
+        StopPendingGameOverRoutine();
+        gameOverRoutine = StartCoroutine(ShowGameOverWithDelay());
+        yield break;
     }
 
     private void HandleFailure(string feedback)

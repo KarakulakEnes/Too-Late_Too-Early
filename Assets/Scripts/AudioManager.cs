@@ -15,6 +15,8 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip gameplayMusicClip;
     [SerializeField] private AudioClip perfectSfxClip;
     [SerializeField] private AudioClip gameOverSfxClip;
+    [SerializeField] private AudioClip specialOrderStartClip;
+    [SerializeField] private AudioClip specialOrderSuccessClip;
 
     [Header("Default Volumes")]
     [SerializeField, Range(0f, 1f)] private float defaultMusicVolume = 0.45f;
@@ -73,6 +75,26 @@ public class AudioManager : MonoBehaviour
         }
 
         sfxSource.PlayOneShot(perfectSfxClip);
+    }
+
+    public void PlaySpecialOrderStart()
+    {
+        if (sfxSource == null || specialOrderStartClip == null)
+        {
+            return;
+        }
+
+        sfxSource.PlayOneShot(specialOrderStartClip);
+    }
+
+    public void PlaySpecialOrderSuccess()
+    {
+        if (sfxSource == null || specialOrderSuccessClip == null)
+        {
+            return;
+        }
+
+        sfxSource.PlayOneShot(specialOrderSuccessClip);
     }
 
     public void SetMusicVolume(float volume)

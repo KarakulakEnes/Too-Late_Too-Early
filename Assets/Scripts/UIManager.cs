@@ -16,6 +16,19 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text menuLastScoreText;
 
     [Header("Game UI")]
+    [SerializeField] private GameObject classicGameHudRoot;
+    [SerializeField] private GameObject specialOrderRoot;
+    [SerializeField] private RectTransform counterTop;
+    [SerializeField] private float counterIntroSlide = -420f;
+    [SerializeField] private float counterIntroDuration = 0.4f;
+    [SerializeField] private TMP_Text specialOrderBanner;
+    [SerializeField] private TMP_Text specialOrderTimer;
+    [SerializeField] private float specialOrderTitleHoldSeconds = 2f;
+    [SerializeField] private GameObject specialOrderTouchBlocker;
+    [SerializeField] private GameObject niceOverlay;
+    [SerializeField] private TMP_Text niceText;
+    [SerializeField] private float niceDisplaySeconds = 2.5f;
+    [SerializeField] private string timerFormat = "{0:0.0}s";
     [SerializeField] private TMP_Text scoreText;
     [SerializeField] private Image[] lifeHeartImages;
     [SerializeField] private Sprite heartFullSprite;
@@ -51,6 +64,9 @@ public class UIManager : MonoBehaviour
     private Coroutine flashRoutine;
     private Coroutine pulseRoutine;
     private Coroutine heartLoseRoutine;
+    private Coroutine specialIntroRoutine;
+    private Vector2 _counterStartAnchored;
+    private bool _cachedCounter;
 
     public void ShowMainMenu(int bestScore, int lastScore)
     {
@@ -65,6 +81,10 @@ public class UIManager : MonoBehaviour
     {
         SetPanelState(false, true, false);
         SetSettingsPanelVisible(false);
+        if (specialOrderRoot != null) specialOrderRoot.SetActive(false);
+        if (specialOrderTouchBlocker != null) specialOrderTouchBlocker.SetActive(false);
+        if (niceOverlay != null) niceOverlay.SetActive(false);
+        if (classicGameHudRoot != null) classicGameHudRoot.SetActive(true);
         UpdateScore(score);
         UpdateLives(lives);
         ShowFeedback(string.Empty, accentColor, false);
@@ -103,6 +123,95 @@ public class UIManager : MonoBehaviour
 
         int lostHeartIndex = Mathf.Clamp(livesRemaining, 0, lifeHeartImages.Length - 1);
         heartLoseRoutine = StartCoroutine(AnimateLifeLossRoutine(livesRemaining, lostHeartIndex));
+    }
+
+    private string _niceMessage = "Nice!";
+
+    public void SetSpecialOrderCopy(string title, string niceMessage)
+    {
+        if (!string.IsNullOrEmpty(title)) SetText(specialOrderBanner, title);
+        if (!string.IsNullOrEmpty(niceMessage)) _niceMessage = niceMessage;
+    }
+
+    public IEnumerator PlaySpecialOrderIntro()
+    {
+        if (niceOverlay != null) niceOverlay.SetActive(false);
+        if (classicGameHudRoot != null) classicGameHudRoot.SetActive(false);
+        if (specialOrderRoot != null) specialOrderRoot.SetActive(true);
+        if (specialOrderTouchBlocker != null) specialOrderTouchBlocker.SetActive(true);
+        if (specialOrderBanner != null) specialOrderBanner.gameObject.SetActive(true);
+        ClearSpecialOrderTimer();
+        if (counterTop != null)
+        {
+            if (!_cachedCounter)
+            {
+                _counterStartAnchored = counterTop.anchoredPosition;
+                _cachedCounter = true;
+            }
+
+            Vector2 end = _counterStartAnchored;
+            Vector2 start = end + new Vector2(0f, counterIntroSlide);
+            counterTop.anchoredPosition = start;
+            float d = Mathf.Max(0.05f, counterIntroDuration);
+            float e = 0f;
+            while (e < d)
+            {
+                e += Time.deltaTime;
+                float u = Mathf.Clamp01(e / d);
+                counterTop.anchoredPosition = Vector2.Lerp(start, end, u);
+                yield return null;
+            }
+
+            counterTop.anchoredPosition = end;
+        }
+        else
+        {
+            yield return null;
+        }
+
+        float titleHold = Mathf.Max(0f, specialOrderTitleHoldSeconds);
+        if (titleHold > 0f)
+        {
+            yield return new WaitForSeconds(titleHold);
+        }
+
+        if (specialOrderBanner != null) specialOrderBanner.gameObject.SetActive(false);
+        if (specialOrderTouchBlocker != null) specialOrderTouchBlocker.SetActive(false);
+    }
+
+    public void SetSpecialOrderTimer(float secondsRemaining)
+    {
+        if (specialOrderTimer == null)
+        {
+            return;
+        }
+
+        specialOrderTimer.text = string.Format(timerFormat, Mathf.Max(0f, secondsRemaining));
+    }
+
+    public void ClearSpecialOrderTimer()
+    {
+        if (specialOrderTimer != null) specialOrderTimer.text = string.Empty;
+    }
+
+    public IEnumerator PlayNiceEffect()
+    {
+        if (niceText != null) SetText(niceText, _niceMessage);
+        if (niceOverlay != null) niceOverlay.SetActive(true);
+        float w = Mathf.Max(0.1f, niceDisplaySeconds);
+        yield return new WaitForSeconds(w);
+        if (niceOverlay != null) niceOverlay.SetActive(false);
+    }
+
+    public void ExitSpecialOrder()
+    {
+        ClearSpecialOrderTimer();
+        if (specialOrderRoot != null) specialOrderRoot.SetActive(false);
+        if (specialOrderTouchBlocker != null) specialOrderTouchBlocker.SetActive(false);
+        if (specialOrderBanner != null) specialOrderBanner.gameObject.SetActive(true);
+        if (niceOverlay != null) niceOverlay.SetActive(false);
+        if (classicGameHudRoot != null) classicGameHudRoot.SetActive(true);
+        if (counterTop != null && _cachedCounter) counterTop.anchoredPosition = _counterStartAnchored;
     }
 
     public void ConfigureLocalizedFormats(

@@ -1,0 +1,1053 @@
+fileFormatVersion: 2
+guid: 86929c78988b25a489d86296405b38e2
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5746111499590715240
+    second: slot2_0
+  - first:
+      213: 2080908763663765986
+    second: slot2_1
+  - first:
+      213: -8270598344533806506
+    second: slot2_2
+  - first:
+      213: 7086072892310836769
+    second: slot2_3
+  - first:
+      213: -3972467257922509750
+    second: slot2_4
+  - first:
+      213: 8034926114515865616
+    second: slot2_5
+  - first:
+      213: 2329333772135378991
+    second: slot2_6
+  - first:
+      213: 5964012079256521250
+    second: slot2_7
+  - first:
+      213: 6599101278247637850
+    second: slot2_8
+  - first:
+      213: -4377109283646434474
+    second: slot2_9
+  - first:
+      213: 6776189549171530716
+    second: slot2_10
+  - first:
+      213: -8292218430389530629
+    second: slot2_11
+  - first:
+      213: -5607292242003211299
+    second: slot2_12
+  - first:
+      213: -6405703015517131759
+    second: slot2_13
+  - first:
+      213: 8560403427999936001
+    second: slot2_14
+  - first:
+      213: -4946868453201529050
+    second: slot2_15
+  - first:
+      213: -4903415133669982263
+    second: slot2_16
+  - first:
+      213: -8951666185915448846
+    second: slot2_17
+  - first:
+      213: -6411721350560696361
+    second: slot2_18
+  - first:
+      213: 3695673358197280369
+    second: slot2_19
+  - first:
+      213: 1013971032943176896
+    second: slot2_20
+  - first:
+      213: -2733602898600768347
+    second: slot2_21
+  - first:
+      213: 6572019034676094002
+    second: slot2_22
+  - first:
+      213: 6143854664775994213
+    second: slot2_23
+  - first:
+      213: 2601059824275691236
+    second: slot2_24
+  - first:
+      213: 2134257713549109802
+    second: slot2_25
+  - first:
+      213: -1817754440119001499
+    second: slot2_26
+  - first:
+      213: -6219877531623621511
+    second: slot2_27
+  - first:
+      213: 4938108233240187796
+    second: slot2_28
+  - first:
+      213: -1224278709627646591
+    second: slot2_29
+  - first:
+      213: 7293508513813120760
+    second: slot2_30
+  - first:
+      213: -7374540647521685441
+    second: slot2_31
+  - first:
+      213: 3984366014732326474
+    second: slot2_32
+  - first:
+      213: -966591165802117329
+    second: slot2_33
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: slot2_0
+      rect:
+        serializedVersion: 2
+        x: 153
+        y: 377
+        width: 30
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 898bb1b0906b140b0800000000000000
+      internalID: -5746111499590715240
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_1
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 388
+        width: 32
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e11d24de7fd0ec10800000000000000
+      internalID: 2080908763663765986
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_2
+      rect:
+        serializedVersion: 2
+        x: 232
+        y: 370
+        width: 29
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 652f02a00aee83d80800000000000000
+      internalID: -8270598344533806506
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_3
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 348
+        width: 22
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12656be70c9c65260800000000000000
+      internalID: 7086072892310836769
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_4
+      rect:
+        serializedVersion: 2
+        x: 262
+        y: 342
+        width: 20
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a44a8a17316fed8c0800000000000000
+      internalID: -3972467257922509750
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_5
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 315
+        width: 29
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0105a34fabac18f60800000000000000
+      internalID: 8034926114515865616
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_6
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 329
+        width: 32
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f20337379b4735020800000000000000
+      internalID: 2329333772135378991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_7
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 327
+        width: 20
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22a493c236d64c250800000000000000
+      internalID: 5964012079256521250
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_8
+      rect:
+        serializedVersion: 2
+        x: 275
+        y: 324
+        width: 19
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a53d6c626a7b49b50800000000000000
+      internalID: 6599101278247637850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_9
+      rect:
+        serializedVersion: 2
+        x: 301
+        y: 324
+        width: 32
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65390352c426143c0800000000000000
+      internalID: -4377109283646434474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_10
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 309
+        width: 29
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cdb55114e7cd90e50800000000000000
+      internalID: 6776189549171530716
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_11
+      rect:
+        serializedVersion: 2
+        x: 13
+        y: 283
+        width: 22
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bff4fa8854f1cec80800000000000000
+      internalID: -8292218430389530629
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_12
+      rect:
+        serializedVersion: 2
+        x: 372
+        y: 277
+        width: 22
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ddb48932a65ee22b0800000000000000
+      internalID: -5607292242003211299
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_13
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 243
+        width: 13
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 11ce377db0f5a17a0800000000000000
+      internalID: -6405703015517131759
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_14
+      rect:
+        serializedVersion: 2
+        x: 387
+        y: 237
+        width: 13
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10ee8f31099acc670800000000000000
+      internalID: 8560403427999936001
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_15
+      rect:
+        serializedVersion: 2
+        x: 13
+        y: 205
+        width: 21
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6273658f951395bb0800000000000000
+      internalID: -4946868453201529050
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_16
+      rect:
+        serializedVersion: 2
+        x: 372
+        y: 200
+        width: 21
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9cf73535ae193fbb0800000000000000
+      internalID: -4903415133669982263
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_17
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 177
+        width: 19
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f142a8280b45c380800000000000000
+      internalID: -8951666185915448846
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_18
+      rect:
+        serializedVersion: 2
+        x: 351
+        y: 176
+        width: 20
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d7ba05076df407a0800000000000000
+      internalID: -6411721350560696361
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_19
+      rect:
+        serializedVersion: 2
+        x: 358
+        y: 160
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 17e4939b65ba94330800000000000000
+      internalID: 3695673358197280369
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_20
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 141
+        width: 20
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0cc2d1f3849521e00800000000000000
+      internalID: 1013971032943176896
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_21
+      rect:
+        serializedVersion: 2
+        x: 371
+        y: 124
+        width: 15
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ac4cef95aa401ad0800000000000000
+      internalID: -2733602898600768347
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_22
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 101
+        width: 15
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23469f2fd70843b50800000000000000
+      internalID: 6572019034676094002
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_23
+      rect:
+        serializedVersion: 2
+        x: 366
+        y: 85
+        width: 19
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56b899d144b534550800000000000000
+      internalID: 6143854664775994213
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_24
+      rect:
+        serializedVersion: 2
+        x: 29
+        y: 66
+        width: 24
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e61e711122d81420800000000000000
+      internalID: 2601059824275691236
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_25
+      rect:
+        serializedVersion: 2
+        x: 58
+        y: 49
+        width: 31
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2a6b3b25186e9d10800000000000000
+      internalID: 2134257713549109802
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_26
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 56
+        width: 28
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56e51d3b7f906c6e0800000000000000
+      internalID: -1817754440119001499
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_27
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 47
+        width: 32
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 97cf32dd65e8ea9a0800000000000000
+      internalID: -6219877531623621511
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_28
+      rect:
+        serializedVersion: 2
+        x: 135
+        y: 25
+        width: 23
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49396b0664fa78440800000000000000
+      internalID: 4938108233240187796
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_29
+      rect:
+        serializedVersion: 2
+        x: 263
+        y: 45
+        width: 27
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18d0296000d720fe0800000000000000
+      internalID: -1224278709627646591
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_30
+      rect:
+        serializedVersion: 2
+        x: 299
+        y: 47
+        width: 32
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f64e14c95fb73560800000000000000
+      internalID: 7293508513813120760
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_31
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 2
+        width: 31
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f307ac26a5e58a990800000000000000
+      internalID: -7374540647521685441
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_32
+      rect:
+        serializedVersion: 2
+        x: 201
+        y: 0
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a465243c7cf4b4730800000000000000
+      internalID: 3984366014732326474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot2_33
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 15
+        width: 24
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f278557b47af592f0800000000000000
+      internalID: -966591165802117329
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      slot2_0: -5746111499590715240
+      slot2_1: 2080908763663765986
+      slot2_10: 6776189549171530716
+      slot2_11: -8292218430389530629
+      slot2_12: -5607292242003211299
+      slot2_13: -6405703015517131759
+      slot2_14: 8560403427999936001
+      slot2_15: -4946868453201529050
+      slot2_16: -4903415133669982263
+      slot2_17: -8951666185915448846
+      slot2_18: -6411721350560696361
+      slot2_19: 3695673358197280369
+      slot2_2: -8270598344533806506
+      slot2_20: 1013971032943176896
+      slot2_21: -2733602898600768347
+      slot2_22: 6572019034676094002
+      slot2_23: 6143854664775994213
+      slot2_24: 2601059824275691236
+      slot2_25: 2134257713549109802
+      slot2_26: -1817754440119001499
+      slot2_27: -6219877531623621511
+      slot2_28: 4938108233240187796
+      slot2_29: -1224278709627646591
+      slot2_3: 7086072892310836769
+      slot2_30: 7293508513813120760
+      slot2_31: -7374540647521685441
+      slot2_32: 3984366014732326474
+      slot2_33: -966591165802117329
+      slot2_4: -3972467257922509750
+      slot2_5: 8034926114515865616
+      slot2_6: 2329333772135378991
+      slot2_7: 5964012079256521250
+      slot2_8: 6599101278247637850
+      slot2_9: -4377109283646434474
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
