@@ -155,12 +155,12 @@ TextureImporter:
       name: heart_full_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 2
-        width: 602
-        height: 508
+        x: 5
+        y: 7
+        width: 614
+        height: 565
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -177,7 +177,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: e2bd3038cdf278c44b7b9a847e178cf5
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
