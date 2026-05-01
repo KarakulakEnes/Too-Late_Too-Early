@@ -8,7 +8,7 @@ public class TimingController : MonoBehaviour
 
     [Header("Timing")]
     [SerializeField] private float minCycleDuration = 1.5f;
-    [SerializeField] private float maxCycleDuration = 3f;
+    [SerializeField] private float maxCycleDuration = 2.6f;
     [SerializeField] private float perfectStart = 0.95f;
     [SerializeField] private float perfectEnd = 1f;
     [SerializeField] private float lateResetThreshold = 1.1f;
