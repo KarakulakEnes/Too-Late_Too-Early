@@ -15,6 +15,15 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text menuBestScoreText;
     [SerializeField] private TMP_Text menuLastScoreText;
 
+    [Header("Main Menu — Progression Header")]
+    [SerializeField] private GameObject profileHeaderRoot;
+    [SerializeField] private Button profileOpenButton;
+    [SerializeField] private Image profileAvatarImage;
+    [SerializeField] private TMP_Text profileLevelRankText;
+    [SerializeField] private TMP_Text profileXpProgressText;
+    [SerializeField] private Image profileXpFillImage;
+    [SerializeField] private Sprite[] profileAvatarSprites = new Sprite[25];
+
     [Header("Game UI")]
     [SerializeField] private GameObject classicGameHudRoot;
     [SerializeField] private GameObject specialOrderRoot;
@@ -49,6 +58,11 @@ public class UIManager : MonoBehaviour
     [SerializeField] private float flashDuration = 0.12f;
     [SerializeField] private float flashAlpha = 0.35f;
 
+    [Header("Wrong Time Splash")]
+    [SerializeField] private Image wrongTimeSplashImage;
+    [SerializeField] private float wrongTimeSplashHoldSeconds = 0.05f;
+    [SerializeField] private float wrongTimeSplashFadeSeconds = 0.35f;
+
     [Header("Colors")]
     [SerializeField] private Color successColor = new Color32(0x22, 0xC5, 0x5E, 0xFF);
     [SerializeField] private Color errorColor = new Color32(0xEF, 0x44, 0x44, 0xFF);
@@ -62,11 +76,21 @@ public class UIManager : MonoBehaviour
     [SerializeField] private string gameOverBestScoreFormat = "Best Score: {0}";
 
     private Coroutine flashRoutine;
+    private Coroutine wrongTimeSplashRoutine;
     private Coroutine pulseRoutine;
     private Coroutine heartLoseRoutine;
     private Coroutine specialIntroRoutine;
     private Vector2 _counterStartAnchored;
     private bool _cachedCounter;
+
+    private void Awake()
+    {
+        GameManager gm = GetComponent<GameManager>();
+        if (profileOpenButton != null && gm != null)
+        {
+            profileOpenButton.onClick.AddListener(gm.OnProfileHeaderClicked);
+        }
+    }
 
     public void ShowMainMenu(int bestScore, int lastScore)
     {
@@ -75,6 +99,62 @@ public class UIManager : MonoBehaviour
         SetText(menuBestScoreText, string.Format(bestScoreFormat, bestScore));
         SetText(menuLastScoreText, string.Format(lastScoreFormat, lastScore));
         SetText(feedbackText, string.Empty);
+        HideWrongTimeSplash();
+        if (profileHeaderRoot != null)
+        {
+            profileHeaderRoot.SetActive(true);
+        }
+    }
+
+    public Sprite GetProfileAvatarSprite(int index)
+    {
+        index = Mathf.Clamp(index, 0, ProgressionData.AvatarCount - 1);
+        if (profileAvatarSprites != null && index < profileAvatarSprites.Length && profileAvatarSprites[index] != null)
+        {
+            return profileAvatarSprites[index];
+        }
+
+        return heartFullSprite;
+    }
+
+    public void UpdateProfileProgressHeader(
+        ProgressionSnapshot snap,
+        string levelRankLine,
+        string xpProgressLine,
+        Sprite avatarSprite)
+    {
+        if (profileHeaderRoot != null)
+        {
+            profileHeaderRoot.SetActive(true);
+        }
+
+        if (profileAvatarImage != null)
+        {
+            if (avatarSprite != null)
+            {
+                profileAvatarImage.sprite = avatarSprite;
+            }
+
+            profileAvatarImage.color = Color.white;
+        }
+
+        if (profileLevelRankText != null)
+        {
+            profileLevelRankText.text = levelRankLine;
+            profileLevelRankText.color = ProgressionData.GetTierColor(snap.Tier);
+        }
+
+        SetText(profileXpProgressText, xpProgressLine);
+
+        if (profileXpFillImage != null)
+        {
+            float fill = snap.Level >= ProgressionData.MaxLevel
+                ? 1f
+                : snap.XpNeededForNext > 0
+                    ? Mathf.Clamp01((float)snap.XpIntoCurrentLevel / snap.XpNeededForNext)
+                    : 0f;
+            profileXpFillImage.fillAmount = fill;
+        }
     }
 
     public void ShowGame(int score, int lives)
@@ -85,6 +165,7 @@ public class UIManager : MonoBehaviour
         if (specialOrderTouchBlocker != null) specialOrderTouchBlocker.SetActive(false);
         if (niceOverlay != null) niceOverlay.SetActive(false);
         if (classicGameHudRoot != null) classicGameHudRoot.SetActive(true);
+        HideWrongTimeSplash();
         UpdateScore(score);
         UpdateLives(lives);
         ShowFeedback(string.Empty, accentColor, false);
@@ -94,6 +175,7 @@ public class UIManager : MonoBehaviour
     {
         SetPanelState(false, false, true);
         SetSettingsPanelVisible(false);
+        HideWrongTimeSplash();
         SetText(finalScoreText, string.Format(finalScoreFormat, finalScore));
         SetText(gameOverBestScoreText, string.Format(gameOverBestScoreFormat, bestScore));
         if (continueButton != null)
@@ -281,6 +363,21 @@ public class UIManager : MonoBehaviour
         PlayFlash(errorColor);
     }
 
+    public void PlayWrongTimeSplash()
+    {
+        if (wrongTimeSplashImage == null)
+        {
+            return;
+        }
+
+        if (wrongTimeSplashRoutine != null)
+        {
+            StopCoroutine(wrongTimeSplashRoutine);
+        }
+
+        wrongTimeSplashRoutine = StartCoroutine(WrongTimeSplashRoutine());
+    }
+
     public void PlaySuccessSfx()
     {
         // Placeholder for future audio hook.
@@ -341,6 +438,53 @@ public class UIManager : MonoBehaviour
 
         flashOverlay.gameObject.SetActive(false);
         flashRoutine = null;
+    }
+
+    private void HideWrongTimeSplash()
+    {
+        if (wrongTimeSplashRoutine != null)
+        {
+            StopCoroutine(wrongTimeSplashRoutine);
+            wrongTimeSplashRoutine = null;
+        }
+
+        if (wrongTimeSplashImage == null)
+        {
+            return;
+        }
+
+        Color c = wrongTimeSplashImage.color;
+        c.a = 0f;
+        wrongTimeSplashImage.color = c;
+        wrongTimeSplashImage.gameObject.SetActive(false);
+    }
+
+    private IEnumerator WrongTimeSplashRoutine()
+    {
+        wrongTimeSplashImage.gameObject.SetActive(true);
+        Color opaque = wrongTimeSplashImage.color;
+        opaque.a = 1f;
+        wrongTimeSplashImage.color = opaque;
+
+        float hold = Mathf.Max(0f, wrongTimeSplashHoldSeconds);
+        if (hold > 0f)
+        {
+            yield return new WaitForSeconds(hold);
+        }
+
+        float fade = Mathf.Max(0.01f, wrongTimeSplashFadeSeconds);
+        float elapsed = 0f;
+        while (elapsed < fade)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / fade);
+            Color next = opaque;
+            next.a = Mathf.Lerp(1f, 0f, t);
+            wrongTimeSplashImage.color = next;
+            yield return null;
+        }
+
+        HideWrongTimeSplash();
     }
 
     private void PlayPulse()

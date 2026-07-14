@@ -9,6 +9,46 @@ public class LocalizationLite : MonoBehaviour
         Turkish
     }
 
+    private static readonly string[] RankNamesTr =
+    {
+        "Stajyer",
+        "Çırak",
+        "Yardımcı",
+        "Usta Çırak",
+        "Kalfa",
+        "Usta Kalfa",
+        "Şef Yardımcı",
+        "Şef",
+        "Baş Şef",
+        "Patron Şefi",
+        "Gurme Uzmanı",
+        "Efsane Şef",
+        "Altın Önlük",
+        "Mutfak İmparatoru",
+        "Zamansız Usta"
+    };
+
+    private static readonly string[] RankNamesEn =
+    {
+        "Intern",
+        "Apprentice",
+        "Commis",
+        "Junior Cook",
+        "Line Cook",
+        "Senior Cook",
+        "Sous Chef",
+        "Chef de Partie",
+        "Head Chef",
+        "Executive Chef",
+        "Master Chef",
+        "Legend Chef",
+        "Golden Apron",
+        "Kitchen Emperor",
+        "Timeless Master"
+    };
+
+    private SupportedLanguage _activeLanguage;
+
     [Header("References")]
     [SerializeField] private GameManager gameManager;
     [SerializeField] private UIManager uiManager;
@@ -27,11 +67,12 @@ public class LocalizationLite : MonoBehaviour
     [SerializeField] private TMP_Text continueButtonLabel;
     [SerializeField] private TMP_Text backToMenuButtonLabel;
     [SerializeField] private TMP_Text resetButtonLabel;
+    [SerializeField] private TMP_Text resetXpButtonLabel;
 
     [Header("Language")]
     [SerializeField] private SupportedLanguage defaultLanguage = SupportedLanguage.Turkish;
 
-    private void Start()
+    private void Awake()
     {
         Apply(defaultLanguage);
     }
@@ -48,6 +89,8 @@ public class LocalizationLite : MonoBehaviour
 
     private void Apply(SupportedLanguage language)
     {
+        _activeLanguage = language;
+
         if (language == SupportedLanguage.Turkish)
         {
             SetLabel(playButtonLabel, "Oyna");
@@ -63,6 +106,7 @@ public class LocalizationLite : MonoBehaviour
             SetLabel(continueButtonLabel, "Devam Et (+1 hak)");
             SetLabel(backToMenuButtonLabel, "Ana Menü");
             SetLabel(resetButtonLabel, "Skorları Sıfırla");
+            SetLabel(resetXpButtonLabel, "XP Sıfırla");
 
             if (uiManager != null)
             {
@@ -82,11 +126,15 @@ public class LocalizationLite : MonoBehaviour
                     "Skorları Sıfırla",
                     "Onay için tekrar dokun",
                     "Skorları sıfırlamak için 3 saniye içinde tekrar dokun.",
+                    "XP Sıfırla",
+                    "Onay için tekrar dokun",
+                    "XP'yi sıfırlamak için 3 saniye içinde tekrar dokun.",
                     new[] { "Mükemmel", "Harika", "Süper", "Temiz Vuruş", "Nefis" },
                     new[] { "Alev Aldın!", "Durmak Yok!", "Efsane!", "Canavar Gibi!" },
                     new[] { "Çok Erken", "Erken", "Biraz Erken", "Biraz Bekle" },
                     new[] { "Çok Geç", "Geç", "Biraz Geç", "Kaçırdın" });
                 gameManager.RefreshLocalizedTexts();
+                gameManager.RefreshProgressionHeaderUi();
             }
 
             return;
@@ -105,6 +153,7 @@ public class LocalizationLite : MonoBehaviour
         SetLabel(continueButtonLabel, "Continue (+1 chance)");
         SetLabel(backToMenuButtonLabel, "Main Menu");
         SetLabel(resetButtonLabel, "Reset Scores");
+        SetLabel(resetXpButtonLabel, "Reset XP");
 
         if (uiManager != null)
         {
@@ -124,12 +173,69 @@ public class LocalizationLite : MonoBehaviour
                 "Reset Scores",
                 "Tap Again to Confirm",
                 "Tap again within 3 seconds to reset scores.",
+                "Reset XP",
+                "Tap Again to Confirm",
+                "Tap again within 3 seconds to reset XP.",
                 new[] { "Perfect", "Great", "Nice", "Awesome", "Clean Tap" },
                 new[] { "On Fire!", "Unstoppable!", "Godlike!", "Legend!" },
                 new[] { "Too Early", "Early", "Bit Early", "Wait More" },
                 new[] { "Too Late", "Late", "Bit Late", "Missed It" });
             gameManager.RefreshLocalizedTexts();
+            gameManager.RefreshProgressionHeaderUi();
         }
+    }
+
+    public string GetRankNameForLevel(int level)
+    {
+        level = Mathf.Clamp(level, ProgressionData.MinLevel, ProgressionData.MaxLevel);
+        int index = level - 1;
+        return _activeLanguage == SupportedLanguage.Turkish ? RankNamesTr[index] : RankNamesEn[index];
+    }
+
+    public string FormatLevelRankLine(int level, string rankName)
+    {
+        return _activeLanguage == SupportedLanguage.Turkish
+            ? string.Format("Seviye {0} - {1}", level, rankName)
+            : string.Format("Level {0} - {1}", level, rankName);
+    }
+
+    public string FormatXpProgressLine(int currentXpInLevel, int xpNeededForNext)
+    {
+        return _activeLanguage == SupportedLanguage.Turkish
+            ? string.Format("{0} / {1} TP", currentXpInLevel, xpNeededForNext)
+            : string.Format("{0} / {1} XP", currentXpInLevel, xpNeededForNext);
+    }
+
+    public string GetMaxLevelXpLabel()
+    {
+        return _activeLanguage == SupportedLanguage.Turkish ? "Maksimum seviye" : "Max level";
+    }
+
+    public string GetProfileTitle()
+    {
+        return _activeLanguage == SupportedLanguage.Turkish ? "Profil" : "Profile";
+    }
+
+    public string GetStartScoreSectionTitle()
+    {
+        return _activeLanguage == SupportedLanguage.Turkish ? "Başlangıç Skoru" : "Start Score";
+    }
+
+    public string GetChooseAvatarTitle()
+    {
+        return _activeLanguage == SupportedLanguage.Turkish ? "Avatarını Seç" : "Choose Your Avatar";
+    }
+
+    public string GetLockedLabel()
+    {
+        return _activeLanguage == SupportedLanguage.Turkish ? "Kilitli" : "Locked";
+    }
+
+    public string FormatUnlocksAtLevel(int levelRequired)
+    {
+        return _activeLanguage == SupportedLanguage.Turkish
+            ? string.Format("Açılıyor: Seviye {0}", levelRequired)
+            : string.Format("Unlocks at Level {0}", levelRequired);
     }
 
     private void SetLabel(TMP_Text target, string value)

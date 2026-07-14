@@ -25,6 +25,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private InputHandler inputHandler;
     [SerializeField] private AudioManager audioManager;
     [SerializeField] private SpecialOrderController specialOrderController;
+    [SerializeField] private ProgressionService progressionService;
+    [SerializeField] private LocalizationLite localizationLite;
+    [SerializeField] private ProfilePanelController profilePanel;
 
     [Header("Game Rules")]
     [SerializeField] private int startingLives = 3;
@@ -38,6 +41,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] private string resetButtonDefaultText = "Reset Scores";
     [SerializeField] private string resetButtonConfirmText = "Tap Again to Confirm";
     [SerializeField] private string resetHintConfirmText = "Tap again within 3 seconds to reset scores.";
+    [SerializeField] private TMP_Text resetXpButtonLabel;
+    [SerializeField] private TMP_Text resetXpHintLabel;
+    [SerializeField] private string resetXpButtonDefaultText = "Reset XP";
+    [SerializeField] private string resetXpButtonConfirmText = "Tap Again to Confirm";
+    [SerializeField] private string resetXpHintConfirmText = "Tap again within 3 seconds to reset XP.";
     [SerializeField] private float resetConfirmWindowSeconds = 3f;
 
     [Header("Feedback Variations")]
@@ -54,8 +62,19 @@ public class GameManager : MonoBehaviour
     private int remainingContinueChances;
     private Coroutine gameOverRoutine;
     private bool resetConfirmationArmed;
+    private bool resetXpConfirmationArmed;
     private float resetConfirmationExpiresAt;
+    private float resetXpConfirmationExpiresAt;
     private readonly HashSet<int> triggeredSpecialOrders = new HashSet<int>();
+    private bool runXpFinalized;
+
+    private void Awake()
+    {
+        if (progressionService == null)
+        {
+            progressionService = GetComponent<ProgressionService>();
+        }
+    }
 
     private void Start()
     {
@@ -90,7 +109,9 @@ public class GameManager : MonoBehaviour
         ClearResetConfirmation();
         StopPendingGameOverRoutine();
         triggeredSpecialOrders.Clear();
-        score = 0;
+        runXpFinalized = false;
+        int startScore = progressionService != null ? progressionService.GetStartScoreForCurrentProgress() : 0;
+        score = startScore;
         lives = Mathf.Max(1, startingLives);
         remainingContinueChances = continueBonusChances;
         currentState = GameState.Playing;
@@ -105,6 +126,7 @@ public class GameManager : MonoBehaviour
 
     public void OnTryAgainPressed()
     {
+        FinalizeRunXpIfNeeded();
         OnPlayPressed();
     }
 
@@ -129,7 +151,52 @@ public class GameManager : MonoBehaviour
 
     public void OnBackToMenuPressed()
     {
+        if (currentState == GameState.GameOver)
+        {
+            FinalizeRunXpIfNeeded();
+        }
+
         OpenMainMenu();
+    }
+
+    public void OnProfileHeaderClicked()
+    {
+        if (currentState != GameState.MainMenu || profilePanel == null)
+        {
+            return;
+        }
+
+        profilePanel.Open();
+    }
+
+    public void RefreshProgressionHeaderUi()
+    {
+        if (progressionService == null || uiManager == null)
+        {
+            return;
+        }
+
+        ProgressionSnapshot snap = progressionService.BuildSnapshot();
+        string rankName = localizationLite != null
+            ? localizationLite.GetRankNameForLevel(snap.Level)
+            : $"Rank {snap.Level}";
+        string levelLine = localizationLite != null
+            ? localizationLite.FormatLevelRankLine(snap.Level, rankName)
+            : $"Level {snap.Level} - {rankName}";
+        string xpLine;
+        if (snap.Level >= ProgressionData.MaxLevel)
+        {
+            xpLine = localizationLite != null ? localizationLite.GetMaxLevelXpLabel() : "MAX";
+        }
+        else
+        {
+            xpLine = localizationLite != null
+                ? localizationLite.FormatXpProgressLine(snap.XpIntoCurrentLevel, snap.XpNeededForNext)
+                : $"{snap.XpIntoCurrentLevel} / {snap.XpNeededForNext}";
+        }
+
+        Sprite avatarSprite = uiManager.GetProfileAvatarSprite(snap.SelectedAvatarIndex);
+        uiManager.UpdateProfileProgressHeader(snap, levelLine, xpLine, avatarSprite);
     }
 
     public void OnOpenSettingsPressed()
@@ -150,11 +217,17 @@ public class GameManager : MonoBehaviour
         }
 
         ClearResetConfirmation();
+        ClearResetXpConfirmation();
         uiManager.SetSettingsPanelVisible(false);
     }
 
     public void OnResetScoresPressed()
     {
+        if (resetXpConfirmationArmed)
+        {
+            ClearResetXpConfirmation();
+        }
+
         if (!resetConfirmationArmed || Time.unscaledTime > resetConfirmationExpiresAt)
         {
             resetConfirmationArmed = true;
@@ -181,10 +254,48 @@ public class GameManager : MonoBehaviour
         OpenMainMenu();
     }
 
+    public void OnResetXpPressed()
+    {
+        if (currentState != GameState.MainMenu)
+        {
+            return;
+        }
+
+        if (resetConfirmationArmed)
+        {
+            ClearResetConfirmation();
+        }
+
+        if (!resetXpConfirmationArmed || Time.unscaledTime > resetXpConfirmationExpiresAt)
+        {
+            resetXpConfirmationArmed = true;
+            resetXpConfirmationExpiresAt = Time.unscaledTime + Mathf.Max(0.5f, resetConfirmWindowSeconds);
+            UpdateResetXpButtonLabel(resetXpButtonConfirmText);
+            UpdateResetXpHintLabel(resetXpHintConfirmText);
+            return;
+        }
+
+        if (progressionService != null)
+        {
+            progressionService.ResetProgressionToDefaults();
+        }
+
+        runXpFinalized = false;
+        ClearResetXpConfirmation();
+        RefreshProgressionHeaderUi();
+        if (profilePanel != null)
+        {
+            profilePanel.RefreshAllSlots();
+        }
+    }
+
     public void ConfigureLocalization(
         string nextResetDefault,
         string nextResetConfirm,
         string nextResetHintConfirm,
+        string nextResetXpDefault,
+        string nextResetXpConfirm,
+        string nextResetXpHintConfirm,
         string[] nextPerfectMessages,
         string[] nextStreakMessages,
         string[] nextTooEarlyMessages,
@@ -193,20 +304,30 @@ public class GameManager : MonoBehaviour
         if (!string.IsNullOrWhiteSpace(nextResetDefault)) resetButtonDefaultText = nextResetDefault;
         if (!string.IsNullOrWhiteSpace(nextResetConfirm)) resetButtonConfirmText = nextResetConfirm;
         if (!string.IsNullOrWhiteSpace(nextResetHintConfirm)) resetHintConfirmText = nextResetHintConfirm;
+        if (!string.IsNullOrWhiteSpace(nextResetXpDefault)) resetXpButtonDefaultText = nextResetXpDefault;
+        if (!string.IsNullOrWhiteSpace(nextResetXpConfirm)) resetXpButtonConfirmText = nextResetXpConfirm;
+        if (!string.IsNullOrWhiteSpace(nextResetXpHintConfirm)) resetXpHintConfirmText = nextResetXpHintConfirm;
         if (nextPerfectMessages != null && nextPerfectMessages.Length > 0) perfectMessages = nextPerfectMessages;
         if (nextStreakMessages != null && nextStreakMessages.Length > 0) streakMessages = nextStreakMessages;
         if (nextTooEarlyMessages != null && nextTooEarlyMessages.Length > 0) tooEarlyMessages = nextTooEarlyMessages;
         if (nextTooLateMessages != null && nextTooLateMessages.Length > 0) tooLateMessages = nextTooLateMessages;
 
         ClearResetConfirmation();
+        ClearResetXpConfirmation();
     }
 
     public void RefreshLocalizedTexts()
     {
+        if (profilePanel != null)
+        {
+            profilePanel.RefreshAllSlots();
+        }
+
         switch (currentState)
         {
             case GameState.MainMenu:
                 uiManager.RefreshMainMenuScores(bestScore, lastScore);
+                RefreshProgressionHeaderUi();
                 break;
             case GameState.Playing:
             case GameState.ResolvingFailure:
@@ -222,16 +343,29 @@ public class GameManager : MonoBehaviour
     private void OpenMainMenu()
     {
         ClearResetConfirmation();
+        ClearResetXpConfirmation();
         StopPendingGameOverRoutine();
         if (specialOrderController != null) specialOrderController.ResetToIdle();
         uiManager.ExitSpecialOrder();
         currentState = GameState.MainMenu;
         timingController.Clear();
         uiManager.ShowMainMenu(bestScore, lastScore);
+        RefreshProgressionHeaderUi();
         if (audioManager != null)
         {
             audioManager.PlayMenuMusic();
         }
+    }
+
+    private void FinalizeRunXpIfNeeded()
+    {
+        if (runXpFinalized || progressionService == null)
+        {
+            return;
+        }
+
+        runXpFinalized = true;
+        progressionService.ApplyRunXp(score);
     }
 
     private void EvaluateTap()
@@ -382,6 +516,7 @@ public class GameManager : MonoBehaviour
         uiManager.AnimateLifeLoss(lives);
         uiManager.ShowFeedback(feedback, ErrorFeedbackColor, true);
         uiManager.FlashFailure();
+        uiManager.PlayWrongTimeSplash();
         uiManager.PlayFailSfx();
         if (audioManager != null)
         {
@@ -442,6 +577,11 @@ public class GameManager : MonoBehaviour
 
         currentState = GameState.GameOver;
         uiManager.ShowGameOver(score, bestScore, remainingContinueChances > 0);
+        if (remainingContinueChances <= 0)
+        {
+            FinalizeRunXpIfNeeded();
+        }
+
         gameOverRoutine = null;
     }
 
@@ -462,6 +602,14 @@ public class GameManager : MonoBehaviour
         UpdateResetHintLabel(string.Empty);
     }
 
+    private void ClearResetXpConfirmation()
+    {
+        resetXpConfirmationArmed = false;
+        resetXpConfirmationExpiresAt = 0f;
+        UpdateResetXpButtonLabel(resetXpButtonDefaultText);
+        UpdateResetXpHintLabel(string.Empty);
+    }
+
     private void UpdateResetButtonLabel(string value)
     {
         if (resetScoresButtonLabel != null)
@@ -478,16 +626,37 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void UpdateResetXpButtonLabel(string value)
+    {
+        if (resetXpButtonLabel != null)
+        {
+            resetXpButtonLabel.text = value;
+        }
+    }
+
+    private void UpdateResetXpHintLabel(string value)
+    {
+        if (resetXpHintLabel != null)
+        {
+            resetXpHintLabel.text = value;
+        }
+    }
+
     private void ProcessResetConfirmationTimeout()
     {
-        if (!resetConfirmationArmed)
+        if (!resetConfirmationArmed && !resetXpConfirmationArmed)
         {
             return;
         }
 
-        if (Time.unscaledTime > resetConfirmationExpiresAt)
+        if (resetConfirmationArmed && Time.unscaledTime > resetConfirmationExpiresAt)
         {
             ClearResetConfirmation();
+        }
+
+        if (resetXpConfirmationArmed && Time.unscaledTime > resetXpConfirmationExpiresAt)
+        {
+            ClearResetXpConfirmation();
         }
     }
 }
