@@ -1,10 +1,16 @@
 fileFormatVersion: 2
-guid: a8e961d7d4700c74f95a4aab3378de43
+guid: 8d19dc7485c759843aa6d4376023f54d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1919384633167566679
-    second: again-button_0
+      213: -8458315093470366076
+    second: go-buttons_0
+  - first:
+      213: -9159377292744345732
+    second: go-buttons_1
+  - first:
+      213: 7287589183284279045
+    second: go-buttons_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -152,13 +158,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: again-button_0
+      name: go-buttons_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 1
-        width: 775
-        height: 265
+        x: 61
+        y: 933
+        width: 970
+        height: 448
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -167,8 +173,52 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 9a824b078d9fc55e0800000000000000
-      internalID: -1919384633167566679
+      spriteID: 486bf5f8c370e9a80800000000000000
+      internalID: -8458315093470366076
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: go-buttons_1
+      rect:
+        serializedVersion: 2
+        x: 60
+        y: 497
+        width: 971
+        height: 405
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c77b13671ea53e080800000000000000
+      internalID: -9159377292744345732
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: go-buttons_2
+      rect:
+        serializedVersion: 2
+        x: 60
+        y: 54
+        width: 971
+        height: 414
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50773aa30c7b22560800000000000000
+      internalID: 7287589183284279045
       vertices: []
       indices: 
       edges: []
@@ -187,7 +237,9 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      again-button_0: -1919384633167566679
+      go-buttons_0: -8458315093470366076
+      go-buttons_1: -9159377292744345732
+      go-buttons_2: 7287589183284279045
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
