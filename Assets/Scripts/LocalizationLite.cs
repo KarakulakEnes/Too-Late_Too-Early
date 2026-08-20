@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class LocalizationLite : MonoBehaviour
 {
+    private const string LanguagePrefKey = "settings.language";
+
     private enum SupportedLanguage
     {
         English,
@@ -74,22 +76,44 @@ public class LocalizationLite : MonoBehaviour
 
     private void Awake()
     {
-        Apply(defaultLanguage);
+        Apply(LoadSavedLanguage(), persist: false);
     }
 
     public void ApplyEnglish()
     {
-        Apply(SupportedLanguage.English);
+        Apply(SupportedLanguage.English, persist: true);
     }
 
     public void ApplyTurkish()
     {
-        Apply(SupportedLanguage.Turkish);
+        Apply(SupportedLanguage.Turkish, persist: true);
     }
 
-    private void Apply(SupportedLanguage language)
+    private SupportedLanguage LoadSavedLanguage()
+    {
+        if (!PlayerPrefs.HasKey(LanguagePrefKey))
+        {
+            return defaultLanguage;
+        }
+
+        int saved = PlayerPrefs.GetInt(LanguagePrefKey, (int)defaultLanguage);
+        if (saved == (int)SupportedLanguage.English || saved == (int)SupportedLanguage.Turkish)
+        {
+            return (SupportedLanguage)saved;
+        }
+
+        return defaultLanguage;
+    }
+
+    private void Apply(SupportedLanguage language, bool persist)
     {
         _activeLanguage = language;
+
+        if (persist)
+        {
+            PlayerPrefs.SetInt(LanguagePrefKey, (int)language);
+            PlayerPrefs.Save();
+        }
 
         if (language == SupportedLanguage.Turkish)
         {
@@ -114,10 +138,11 @@ public class LocalizationLite : MonoBehaviour
                     "En İyi Skor: {0}",
                     "Son Skor: {0}",
                     "Skor: {0}",
-                    "Can: {0}",
                     "Final Skor: {0}",
                     "En İyi Skor: {0}");
                 uiManager.SetSpecialOrderCopy("Özel Sipariş", "Harika!");
+                uiManager.SetTimeUpCopy("Süre Doldu!");
+                uiManager.SetHowToPlayLanguage(true);
             }
 
             if (gameManager != null)
@@ -161,10 +186,11 @@ public class LocalizationLite : MonoBehaviour
                 "Best Score: {0}",
                 "Last Score: {0}",
                 "Score: {0}",
-                "Lives: {0}",
                 "Final Score: {0}",
                 "Best Score: {0}");
             uiManager.SetSpecialOrderCopy("Special Order", "Nice!");
+            uiManager.SetTimeUpCopy("Time's Up!");
+            uiManager.SetHowToPlayLanguage(false);
         }
 
         if (gameManager != null)
@@ -224,11 +250,6 @@ public class LocalizationLite : MonoBehaviour
     public string GetChooseAvatarTitle()
     {
         return _activeLanguage == SupportedLanguage.Turkish ? "Avatarını Seç" : "Choose Your Avatar";
-    }
-
-    public string GetLockedLabel()
-    {
-        return _activeLanguage == SupportedLanguage.Turkish ? "Kilitli" : "Locked";
     }
 
     public string FormatUnlocksAtLevel(int levelRequired)

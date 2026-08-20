@@ -27,6 +27,10 @@ public class SettingsAudioUI : MonoBehaviour
     {
         UnregisterSliderListeners();
         StopSfxPreviewRoutine();
+        if (audioManager != null)
+        {
+            audioManager.PersistVolumes();
+        }
     }
 
     private void Start()

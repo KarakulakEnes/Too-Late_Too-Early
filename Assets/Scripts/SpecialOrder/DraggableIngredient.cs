@@ -15,6 +15,7 @@ public class DraggableIngredient : MonoBehaviour, IBeginDragHandler, IDragHandle
     private int _startSibling;
     private bool _placing;
     private bool _succeededThisDrag;
+    private float _canvasScaleFactor = 1f;
     public IngredientType Ingredient => ingredient;
     public Sprite IngredientSprite => iconImage != null ? iconImage.sprite : null;
 
@@ -74,6 +75,9 @@ public class DraggableIngredient : MonoBehaviour, IBeginDragHandler, IDragHandle
         if (_startParent == null) _startParent = _rect.parent;
         _startSibling = _rect.GetSiblingIndex();
         _startAnchored = _rect.anchoredPosition;
+
+        Canvas c = GetComponentInParent<Canvas>();
+        _canvasScaleFactor = c != null ? c.scaleFactor : 1f;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -92,8 +96,7 @@ public class DraggableIngredient : MonoBehaviour, IBeginDragHandler, IDragHandle
     {
         if (_placing) return;
         if (_rect == null) return;
-        Canvas c = GetComponentInParent<Canvas>();
-        if (c != null) _rect.anchoredPosition += eventData.delta / c.scaleFactor;
+        _rect.anchoredPosition += eventData.delta / _canvasScaleFactor;
     }
 
     public void OnEndDrag(PointerEventData eventData)

@@ -15,6 +15,14 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text menuBestScoreText;
     [SerializeField] private TMP_Text menuLastScoreText;
 
+    [Header("Main Menu — How To Play")]
+    [SerializeField] private Button howToPlayOpenButton;
+    [SerializeField] private GameObject howToPlayPopup;
+    [SerializeField] private Image howToPlayDesignImage;
+    [SerializeField] private Sprite howToPlayTurkishSprite;
+    [SerializeField] private Sprite howToPlayEnglishSprite;
+    [SerializeField] private Button howToPlayCloseButton;
+
     [Header("Main Menu — Progression Header")]
     [SerializeField] private GameObject profileHeaderRoot;
     [SerializeField] private Button profileOpenButton;
@@ -37,6 +45,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject niceOverlay;
     [SerializeField] private TMP_Text niceText;
     [SerializeField] private float niceDisplaySeconds = 2.5f;
+    [SerializeField] private GameObject timeUpOverlay;
+    [SerializeField] private TMP_Text timeUpText;
+    [SerializeField] private float timeUpDisplaySeconds = 2f;
     [SerializeField] private string timerFormat = "{0:0.0}s";
     [SerializeField] private TMP_Text scoreText;
     [SerializeField] private Image[] lifeHeartImages;
@@ -79,9 +90,11 @@ public class UIManager : MonoBehaviour
     private Coroutine wrongTimeSplashRoutine;
     private Coroutine pulseRoutine;
     private Coroutine heartLoseRoutine;
-    private Coroutine specialIntroRoutine;
     private Vector2 _counterStartAnchored;
     private bool _cachedCounter;
+    private float _lastTimerDisplayTenths = float.MinValue;
+    private string _timeUpMessage = "Time's Up!";
+    private bool _useTurkishHowToPlay = true;
 
     private void Awake()
     {
@@ -90,12 +103,26 @@ public class UIManager : MonoBehaviour
         {
             profileOpenButton.onClick.AddListener(gm.OnProfileHeaderClicked);
         }
+
+        if (howToPlayOpenButton != null)
+        {
+            howToPlayOpenButton.onClick.AddListener(OpenHowToPlay);
+        }
+
+        if (howToPlayCloseButton != null)
+        {
+            howToPlayCloseButton.onClick.AddListener(CloseHowToPlay);
+        }
+
+        CloseHowToPlay();
+        RefreshHowToPlayDesign();
     }
 
     public void ShowMainMenu(int bestScore, int lastScore)
     {
         SetPanelState(true, false, false);
         SetSettingsPanelVisible(false);
+        CloseHowToPlay();
         SetText(menuBestScoreText, string.Format(bestScoreFormat, bestScore));
         SetText(menuLastScoreText, string.Format(lastScoreFormat, lastScore));
         SetText(feedbackText, string.Empty);
@@ -104,6 +131,30 @@ public class UIManager : MonoBehaviour
         {
             profileHeaderRoot.SetActive(true);
         }
+    }
+
+    public void OpenHowToPlay()
+    {
+        SetSettingsPanelVisible(false);
+        RefreshHowToPlayDesign();
+        if (howToPlayPopup != null)
+        {
+            howToPlayPopup.SetActive(true);
+        }
+    }
+
+    public void CloseHowToPlay()
+    {
+        if (howToPlayPopup != null)
+        {
+            howToPlayPopup.SetActive(false);
+        }
+    }
+
+    public void SetHowToPlayLanguage(bool useTurkish)
+    {
+        _useTurkishHowToPlay = useTurkish;
+        RefreshHowToPlayDesign();
     }
 
     public Sprite GetProfileAvatarSprite(int index)
@@ -161,9 +212,11 @@ public class UIManager : MonoBehaviour
     {
         SetPanelState(false, true, false);
         SetSettingsPanelVisible(false);
+        CloseHowToPlay();
         if (specialOrderRoot != null) specialOrderRoot.SetActive(false);
         if (specialOrderTouchBlocker != null) specialOrderTouchBlocker.SetActive(false);
         if (niceOverlay != null) niceOverlay.SetActive(false);
+        if (timeUpOverlay != null) timeUpOverlay.SetActive(false);
         if (classicGameHudRoot != null) classicGameHudRoot.SetActive(true);
         HideWrongTimeSplash();
         UpdateScore(score);
@@ -175,6 +228,8 @@ public class UIManager : MonoBehaviour
     {
         SetPanelState(false, false, true);
         SetSettingsPanelVisible(false);
+        CloseHowToPlay();
+        if (timeUpOverlay != null) timeUpOverlay.SetActive(false);
         HideWrongTimeSplash();
         SetText(finalScoreText, string.Format(finalScoreFormat, finalScore));
         SetText(gameOverBestScoreText, string.Format(gameOverBestScoreFormat, bestScore));
@@ -215,9 +270,21 @@ public class UIManager : MonoBehaviour
         if (!string.IsNullOrEmpty(niceMessage)) _niceMessage = niceMessage;
     }
 
+    public void SetTimeUpCopy(string timeUpMessage)
+    {
+        if (string.IsNullOrWhiteSpace(timeUpMessage))
+        {
+            return;
+        }
+
+        _timeUpMessage = timeUpMessage;
+        SetText(timeUpText, _timeUpMessage);
+    }
+
     public IEnumerator PlaySpecialOrderIntro()
     {
         if (niceOverlay != null) niceOverlay.SetActive(false);
+        if (timeUpOverlay != null) timeUpOverlay.SetActive(false);
         if (classicGameHudRoot != null) classicGameHudRoot.SetActive(false);
         if (specialOrderRoot != null) specialOrderRoot.SetActive(true);
         if (specialOrderTouchBlocker != null) specialOrderTouchBlocker.SetActive(true);
@@ -268,11 +335,20 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        specialOrderTimer.text = string.Format(timerFormat, Mathf.Max(0f, secondsRemaining));
+        float clamped = Mathf.Max(0f, secondsRemaining);
+        float tenths = Mathf.Floor(clamped * 10f);
+        if (Mathf.Approximately(tenths, _lastTimerDisplayTenths))
+        {
+            return;
+        }
+
+        _lastTimerDisplayTenths = tenths;
+        specialOrderTimer.SetText(timerFormat, clamped);
     }
 
     public void ClearSpecialOrderTimer()
     {
+        _lastTimerDisplayTenths = float.MinValue;
         if (specialOrderTimer != null) specialOrderTimer.text = string.Empty;
     }
 
@@ -285,6 +361,19 @@ public class UIManager : MonoBehaviour
         if (niceOverlay != null) niceOverlay.SetActive(false);
     }
 
+    public IEnumerator PlayTimeUpEffect()
+    {
+        if (niceOverlay != null) niceOverlay.SetActive(false);
+        if (specialOrderTouchBlocker != null) specialOrderTouchBlocker.SetActive(true);
+        if (timeUpText != null) SetText(timeUpText, _timeUpMessage);
+        if (timeUpOverlay != null) timeUpOverlay.SetActive(true);
+
+        float duration = Mathf.Max(0.1f, timeUpDisplaySeconds);
+        yield return new WaitForSeconds(duration);
+
+        if (timeUpOverlay != null) timeUpOverlay.SetActive(false);
+    }
+
     public void ExitSpecialOrder()
     {
         ClearSpecialOrderTimer();
@@ -292,6 +381,7 @@ public class UIManager : MonoBehaviour
         if (specialOrderTouchBlocker != null) specialOrderTouchBlocker.SetActive(false);
         if (specialOrderBanner != null) specialOrderBanner.gameObject.SetActive(true);
         if (niceOverlay != null) niceOverlay.SetActive(false);
+        if (timeUpOverlay != null) timeUpOverlay.SetActive(false);
         if (classicGameHudRoot != null) classicGameHudRoot.SetActive(true);
         if (counterTop != null && _cachedCounter) counterTop.anchoredPosition = _counterStartAnchored;
     }
@@ -300,7 +390,6 @@ public class UIManager : MonoBehaviour
         string nextBestScoreFormat,
         string nextLastScoreFormat,
         string nextScoreFormat,
-        string nextLivesFormat,
         string nextFinalScoreFormat,
         string nextGameOverBestScoreFormat)
     {
@@ -378,16 +467,6 @@ public class UIManager : MonoBehaviour
         wrongTimeSplashRoutine = StartCoroutine(WrongTimeSplashRoutine());
     }
 
-    public void PlaySuccessSfx()
-    {
-        // Placeholder for future audio hook.
-    }
-
-    public void PlayFailSfx()
-    {
-        // Placeholder for future audio hook.
-    }
-
     private void SetPanelState(bool showMenu, bool showGame, bool showGameOver)
     {
         if (mainMenuPanel != null) mainMenuPanel.SetActive(showMenu);
@@ -400,6 +479,22 @@ public class UIManager : MonoBehaviour
         if (target != null)
         {
             target.text = value;
+        }
+    }
+
+    private void RefreshHowToPlayDesign()
+    {
+        if (howToPlayDesignImage == null)
+        {
+            return;
+        }
+
+        Sprite selectedSprite = _useTurkishHowToPlay
+            ? howToPlayTurkishSprite
+            : howToPlayEnglishSprite;
+        if (selectedSprite != null)
+        {
+            howToPlayDesignImage.sprite = selectedSprite;
         }
     }
 

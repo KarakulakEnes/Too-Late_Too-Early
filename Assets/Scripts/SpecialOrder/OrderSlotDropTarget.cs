@@ -13,7 +13,6 @@ public class OrderSlotDropTarget : MonoBehaviour, IDropHandler, IPointerEnterHan
     private IngredientType _required;
     private bool _filled;
     private Color _baseColor;
-    public IngredientType RequiredType => _required;
     public bool IsFilled => _filled;
 
     private void Awake()

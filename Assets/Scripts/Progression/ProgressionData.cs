@@ -18,7 +18,7 @@ public static class ProgressionData
     public const int StartScoreOptionCount = 5;
 
     /// <summary>Selectable run start scores (index 0 = base 0, always unlocked at level 1).</summary>
-    public static readonly int[] StartScores = { 0, 15, 30, 50, 70 };
+    public static readonly int[] StartScores = { 0, 10, 20, 30, 40 };
 
     /// <summary>Level required to unlock each StartScores entry.</summary>
     public static readonly int[] StartScoreUnlockLevels = { 1, 4, 7, 10, 13 };
@@ -168,7 +168,6 @@ public enum RankTier
 /// <summary>Snapshot for UI (localized rank title applied elsewhere).</summary>
 public struct ProgressionSnapshot
 {
-    public int TotalXp;
     public int Level;
     public int XpIntoCurrentLevel;
     public int XpNeededForNext;

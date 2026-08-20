@@ -17,6 +17,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip gameOverSfxClip;
     [SerializeField] private AudioClip specialOrderStartClip;
     [SerializeField] private AudioClip specialOrderSuccessClip;
+    [SerializeField] private AudioClip timeUpAlarmSfxClip;
 
     [Header("Default Volumes")]
     [SerializeField, Range(0f, 1f)] private float defaultMusicVolume = 0.45f;
@@ -97,20 +98,56 @@ public class AudioManager : MonoBehaviour
         sfxSource.PlayOneShot(specialOrderSuccessClip);
     }
 
-    public void SetMusicVolume(float volume)
+    public void PlayTimeUpAlarmSfx()
+    {
+        if (sfxSource == null || timeUpAlarmSfxClip == null)
+        {
+            return;
+        }
+
+        sfxSource.PlayOneShot(timeUpAlarmSfxClip);
+    }
+
+    public void SetMusicVolume(float volume, bool persistImmediately = false)
     {
         musicVolume = Mathf.Clamp01(volume);
         ApplyMusicVolume(musicVolume);
         PlayerPrefs.SetFloat(MusicVolumeKey, musicVolume);
-        PlayerPrefs.Save();
+        if (persistImmediately)
+        {
+            PlayerPrefs.Save();
+        }
     }
 
-    public void SetSfxVolume(float volume)
+    public void SetSfxVolume(float volume, bool persistImmediately = false)
     {
         sfxVolume = Mathf.Clamp01(volume);
         ApplySfxVolume(sfxVolume);
         PlayerPrefs.SetFloat(SfxVolumeKey, sfxVolume);
+        if (persistImmediately)
+        {
+            PlayerPrefs.Save();
+        }
+    }
+
+    public void PersistVolumes()
+    {
+        PlayerPrefs.SetFloat(MusicVolumeKey, musicVolume);
+        PlayerPrefs.SetFloat(SfxVolumeKey, sfxVolume);
         PlayerPrefs.Save();
+    }
+
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        if (pauseStatus)
+        {
+            PersistVolumes();
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        PersistVolumes();
     }
 
     public float GetMusicVolume()

@@ -61,6 +61,7 @@ public class GameManager : MonoBehaviour
     private int bestScore;
     private int remainingContinueChances;
     private Coroutine gameOverRoutine;
+    private Coroutine specialOrderFlowRoutine;
     private bool resetConfirmationArmed;
     private bool resetXpConfirmationArmed;
     private float resetConfirmationExpiresAt;
@@ -92,7 +93,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        if (timingController.CurrentFillAmount > timingController.PerfectEnd)
+        if (timingController.HasFullHoldExpired)
         {
             HandleFailure(GetRandomMessage(tooLateMessages, "Too Late"));
             return;
@@ -100,6 +101,11 @@ public class GameManager : MonoBehaviour
 
         if (inputHandler != null && inputHandler.GetTapDown())
         {
+            if (!timingController.IsInputArmed)
+            {
+                return;
+            }
+
             EvaluateTap();
         }
     }
@@ -108,6 +114,7 @@ public class GameManager : MonoBehaviour
     {
         ClearResetConfirmation();
         StopPendingGameOverRoutine();
+        StopSpecialOrderFlowRoutine();
         triggeredSpecialOrders.Clear();
         runXpFinalized = false;
         int startScore = progressionService != null ? progressionService.GetStartScoreForCurrentProgress() : 0;
@@ -117,6 +124,7 @@ public class GameManager : MonoBehaviour
         currentState = GameState.Playing;
 
         uiManager.ShowGame(score, lives);
+        timingController.ApplyScoreDifficulty(score);
         timingController.Begin();
         if (audioManager != null)
         {
@@ -142,6 +150,7 @@ public class GameManager : MonoBehaviour
         lives = Mathf.Clamp(lives + 1, 1, Mathf.Max(1, startingLives));
         currentState = GameState.Playing;
         uiManager.ShowGame(score, lives);
+        timingController.ApplyScoreDifficulty(score);
         timingController.Begin();
         if (audioManager != null)
         {
@@ -345,6 +354,7 @@ public class GameManager : MonoBehaviour
         ClearResetConfirmation();
         ClearResetXpConfirmation();
         StopPendingGameOverRoutine();
+        StopSpecialOrderFlowRoutine();
         if (specialOrderController != null) specialOrderController.ResetToIdle();
         uiManager.ExitSpecialOrder();
         currentState = GameState.MainMenu;
@@ -378,22 +388,17 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        if (fillAmount > timingController.PerfectEnd)
-        {
-            HandleFailure(GetRandomMessage(tooLateMessages, "Too Late"));
-            return;
-        }
-
+        // Too Late is handled in Update before tap polling; remaining window is Perfect.
         HandlePerfect();
     }
 
     private void HandlePerfect()
     {
         score++;
+        timingController.ApplyScoreDifficulty(score);
         uiManager.UpdateScore(score);
         uiManager.ShowFeedback(GetPerfectFeedbackMessage(), SuccessFeedbackColor, true);
         uiManager.FlashSuccess();
-        uiManager.PlaySuccessSfx();
         if (audioManager != null)
         {
             audioManager.PlayPerfectSfx();
@@ -404,7 +409,8 @@ public class GameManager : MonoBehaviour
             triggeredSpecialOrders.Add(score);
             timingController.Stop();
             currentState = GameState.SpecialOrderPlaying;
-            StartCoroutine(CoStartSpecialOrder(score));
+            StopSpecialOrderFlowRoutine();
+            specialOrderFlowRoutine = StartCoroutine(CoStartSpecialOrder(score));
             return;
         }
 
@@ -449,9 +455,17 @@ public class GameManager : MonoBehaviour
         float t = GetSpecialOrderTimeForScore(triggerScore);
         specialOrderController.BeginRound(
             t,
-            () => { StartCoroutine(CoSpecialOrderSuccess()); },
-            () => { StartCoroutine(CoSpecialOrderFail()); },
-            (remaining) => uiManager.SetSpecialOrderTimer(remaining));
+            () =>
+            {
+                StopSpecialOrderFlowRoutine();
+                specialOrderFlowRoutine = StartCoroutine(CoSpecialOrderSuccess());
+            },
+            () =>
+            {
+                StopSpecialOrderFlowRoutine();
+                specialOrderFlowRoutine = StartCoroutine(CoSpecialOrderFail());
+            },
+            uiManager.SetSpecialOrderTimer);
     }
 
     private IEnumerator CoSpecialOrderSuccess()
@@ -468,6 +482,7 @@ public class GameManager : MonoBehaviour
         }
 
         score++;
+        timingController.ApplyScoreDifficulty(score);
         uiManager.UpdateScore(score);
         yield return uiManager.PlayNiceEffect();
         currentState = GameState.Playing;
@@ -487,13 +502,7 @@ public class GameManager : MonoBehaviour
             specialOrderController.ResetToIdle();
         }
 
-        if (audioManager != null)
-        {
-            audioManager.PlayGameOverSfx();
-        }
-
         lives = 0;
-        uiManager.ExitSpecialOrder();
         currentState = GameState.ResolvingFailure;
         timingController.Stop();
         lastScore = score;
@@ -506,8 +515,23 @@ public class GameManager : MonoBehaviour
 
         PlayerPrefs.Save();
         StopPendingGameOverRoutine();
-        gameOverRoutine = StartCoroutine(ShowGameOverWithDelay());
-        yield break;
+
+        if (audioManager != null)
+        {
+            audioManager.PlayTimeUpAlarmSfx();
+        }
+
+        yield return uiManager.PlayTimeUpEffect();
+
+        uiManager.ExitSpecialOrder();
+        currentState = GameState.GameOver;
+        uiManager.ShowGameOver(score, bestScore, remainingContinueChances > 0);
+        if (remainingContinueChances <= 0)
+        {
+            FinalizeRunXpIfNeeded();
+        }
+
+        specialOrderFlowRoutine = null;
     }
 
     private void HandleFailure(string feedback)
@@ -517,7 +541,6 @@ public class GameManager : MonoBehaviour
         uiManager.ShowFeedback(feedback, ErrorFeedbackColor, true);
         uiManager.FlashFailure();
         uiManager.PlayWrongTimeSplash();
-        uiManager.PlayFailSfx();
         if (audioManager != null)
         {
             audioManager.PlayGameOverSfx();
@@ -591,6 +614,15 @@ public class GameManager : MonoBehaviour
         {
             StopCoroutine(gameOverRoutine);
             gameOverRoutine = null;
+        }
+    }
+
+    private void StopSpecialOrderFlowRoutine()
+    {
+        if (specialOrderFlowRoutine != null)
+        {
+            StopCoroutine(specialOrderFlowRoutine);
+            specialOrderFlowRoutine = null;
         }
     }
 

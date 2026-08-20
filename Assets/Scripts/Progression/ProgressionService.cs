@@ -9,6 +9,8 @@ public class ProgressionService : MonoBehaviour
     private const string KeyTotalXp = "progress.totalXp";
     private const string KeySelectedAvatar = "progress.selectedAvatar";
     private const string KeySelectedStartScore = "progress.selectedStartScore";
+    private const string KeyStartScoreSchemaVersion = "progress.startScoreSchemaVersion";
+    private const int CurrentStartScoreSchemaVersion = 2;
 
     private int _totalXp;
     private int _selectedAvatarIndex;
@@ -22,23 +24,41 @@ public class ProgressionService : MonoBehaviour
     public void Load()
     {
         _totalXp = PlayerPrefs.GetInt(KeyTotalXp, 0);
-        _selectedAvatarIndex = ProgressionData.ClampAvatarIndex(PlayerPrefs.GetInt(KeySelectedAvatar, 0));
+        int loadedAvatar = ProgressionData.ClampAvatarIndex(PlayerPrefs.GetInt(KeySelectedAvatar, 0));
+        _selectedAvatarIndex = loadedAvatar;
 
         EnsureSelectedAvatarUnlocked();
 
         ProgressionData.GetLevelProgress(_totalXp, out int level, out _, out _);
+        int loadedStartScore;
+        bool migratedStartScore = false;
         if (PlayerPrefs.HasKey(KeySelectedStartScore))
         {
-            _selectedStartScore = PlayerPrefs.GetInt(KeySelectedStartScore, 0);
+            loadedStartScore = PlayerPrefs.GetInt(KeySelectedStartScore, 0);
+            int schemaVersion = PlayerPrefs.GetInt(KeyStartScoreSchemaVersion, 1);
+            if (schemaVersion < CurrentStartScoreSchemaVersion)
+            {
+                loadedStartScore = MigrateLegacyStartScore(loadedStartScore);
+                migratedStartScore = true;
+            }
         }
         else
         {
             // Existing saves: keep previous auto-max behavior until the player picks manually.
-            _selectedStartScore = ProgressionData.GetStartScoreForLevel(level);
+            loadedStartScore = ProgressionData.GetStartScoreForLevel(level);
+            migratedStartScore = true;
         }
 
+        _selectedStartScore = loadedStartScore;
         EnsureSelectedStartScoreUnlocked();
-        Save();
+
+        bool dirty = migratedStartScore
+            || _selectedAvatarIndex != loadedAvatar
+            || _selectedStartScore != loadedStartScore;
+        if (dirty)
+        {
+            Save();
+        }
     }
 
     public void Save()
@@ -46,7 +66,20 @@ public class ProgressionService : MonoBehaviour
         PlayerPrefs.SetInt(KeyTotalXp, _totalXp);
         PlayerPrefs.SetInt(KeySelectedAvatar, _selectedAvatarIndex);
         PlayerPrefs.SetInt(KeySelectedStartScore, _selectedStartScore);
+        PlayerPrefs.SetInt(KeyStartScoreSchemaVersion, CurrentStartScoreSchemaVersion);
         PlayerPrefs.Save();
+    }
+
+    private static int MigrateLegacyStartScore(int legacyStartScore)
+    {
+        switch (legacyStartScore)
+        {
+            case 15: return 10;
+            case 30: return 20;
+            case 50: return 30;
+            case 70: return 40;
+            default: return legacyStartScore;
+        }
     }
 
     public static int ComputeRunXp(int finalScore)
@@ -70,7 +103,6 @@ public class ProgressionService : MonoBehaviour
         ProgressionData.GetLevelProgress(_totalXp, out int level, out int xpInto, out int xpNeed);
         return new ProgressionSnapshot
         {
-            TotalXp = _totalXp,
             Level = level,
             XpIntoCurrentLevel = xpInto,
             XpNeededForNext = xpNeed,
@@ -85,8 +117,6 @@ public class ProgressionService : MonoBehaviour
         EnsureSelectedStartScoreUnlocked();
         return _selectedStartScore;
     }
-
-    public int SelectedStartScore => _selectedStartScore;
 
     public bool IsStartScoreUnlocked(int startScore)
     {
@@ -124,8 +154,6 @@ public class ProgressionService : MonoBehaviour
         ProgressionData.GetLevelProgress(_totalXp, out int level, out _, out _);
         return ProgressionData.IsAvatarUnlockedAtLevel(index, level);
     }
-
-    public int SelectedAvatarIndex => _selectedAvatarIndex;
 
     public ProgressionSnapshot ResetProgressionToDefaults()
     {

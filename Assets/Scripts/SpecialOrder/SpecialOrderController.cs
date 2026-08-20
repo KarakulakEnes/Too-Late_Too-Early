@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Text;
-using System.Linq;
 using UnityEngine;
 
 public class SpecialOrderController : MonoBehaviour
@@ -27,11 +24,13 @@ public class SpecialOrderController : MonoBehaviour
         for (int i = 0; i < sourceBowls.Length; i++)
         {
             DraggableIngredient bowl = sourceBowls[i];
-            if (bowl != null) bowl.ResetForRound();
-            if (bowl != null)
+            if (bowl == null)
             {
-                bowl.SetIngredient(ResolveBowlIngredientType(bowl, i));
+                continue;
             }
+
+            bowl.ResetForRound();
+            bowl.SetIngredient(ResolveBowlIngredientType(bowl, i));
         }
 
         _roundRoutine = StartCoroutine(CoRun(timeSeconds));
@@ -62,7 +61,7 @@ public class SpecialOrderController : MonoBehaviour
         return slotTargets.Length >= 5;
     }
 
-    private IEnumerator CoRun(float timeLeft)
+    private System.Collections.IEnumerator CoRun(float timeLeft)
     {
         while (timeLeft > 0f)
         {
@@ -125,31 +124,30 @@ public class SpecialOrderController : MonoBehaviour
             return -1;
         }
 
-        StringBuilder sb = new StringBuilder();
-        for (int i = input.Length - 1; i >= 0; i--)
+        int end = input.Length - 1;
+        while (end >= 0 && !char.IsDigit(input[end]))
         {
-            char c = input[i];
-            if (char.IsDigit(c))
-            {
-                sb.Insert(0, c);
-            }
-            else
-            {
-                break;
-            }
+            end--;
         }
 
-        if (sb.Length == 0)
+        if (end < 0)
         {
             return -1;
         }
 
-        if (int.TryParse(sb.ToString(), out int value))
+        int start = end;
+        while (start > 0 && char.IsDigit(input[start - 1]))
         {
-            return value;
+            start--;
         }
 
-        return -1;
+        int value = 0;
+        for (int i = start; i <= end; i++)
+        {
+            value = (value * 10) + (input[i] - '0');
+        }
+
+        return value;
     }
 
     private void NormalizeBowlsOrder()
@@ -159,10 +157,27 @@ public class SpecialOrderController : MonoBehaviour
             return;
         }
 
-        sourceBowls = sourceBowls
-            .Where(b => b != null)
-            .OrderBy(b => ExtractTrailingNumber(b.gameObject.name))
-            .ToArray();
+        // Small array (4 bowls): insertion sort by trailing index, nulls last. No LINQ/heap alloc.
+        for (int i = 1; i < sourceBowls.Length; i++)
+        {
+            DraggableIngredient key = sourceBowls[i];
+            int keyOrder = key != null ? ExtractTrailingNumber(key.gameObject.name) : int.MaxValue;
+            int j = i - 1;
+            while (j >= 0)
+            {
+                DraggableIngredient other = sourceBowls[j];
+                int otherOrder = other != null ? ExtractTrailingNumber(other.gameObject.name) : int.MaxValue;
+                if (otherOrder <= keyOrder)
+                {
+                    break;
+                }
+
+                sourceBowls[j + 1] = sourceBowls[j];
+                j--;
+            }
+
+            sourceBowls[j + 1] = key;
+        }
     }
 
     private Sprite ResolveSpriteForType(IngredientType type)
